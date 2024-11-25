@@ -1,0 +1,12 @@
+(ocamllex tiger)
+
+(library
+ (name lex)
+ (libraries core)
+ (preprocess
+  (pps ppx_deriving.show)))
+
+(env
+ (dev
+  (flags
+   (:standard -w -33-27))))

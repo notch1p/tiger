@@ -16,7 +16,7 @@
 (package
  (name tiger)
  (synopsis "Tiger book compiler")
- (depends ocaml dune core menhir)
+ (depends ocaml dune core menhir ppx_deriving)
  (tags
   ("compiler" "pldi")))
 

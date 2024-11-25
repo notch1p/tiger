@@ -1,4 +1,4 @@
 (executable
- (public_name tiger)
- (name main)
- (libraries tiger core))
+ (public_name tigerlex)
+ (name lextest)
+ (libraries core lex))

@@ -17,14 +17,12 @@ and exp =
   | OpExp of exp * binop * exp
   | EseqExp of stm * exp
 
-module TableSet = Set.Make (struct
-    type t = id * int
-
-    let compare (id1, _) (id2, _) = String.compare id1 id2
-  end)
-
 module MTableSet = struct
-  include TableSet
+  include Set.Make (struct
+      type t = id * int
+
+      let compare (id1, _) (id2, _) = String.compare id1 id2
+    end)
 
   let addM elt s =
     let s = remove elt s in
