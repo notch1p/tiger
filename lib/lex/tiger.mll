@@ -19,50 +19,50 @@ let id           = letter+ (di | letter | '_')*
 rule read = parse
 | whitespace+   {_DEBUG_NONPRINTABLE (lexeme lexbuf); read lexbuf}
 | newline       {_DEBUG_NONPRINTABLE (lexeme lexbuf); read lexbuf}
-| "while"       {_WHILE              (spos lexbuf, epos lexbuf)}
-| "for"         {_FOR                (spos lexbuf, epos lexbuf)}
-| "to"          {_TO                 (spos lexbuf, epos lexbuf)}
-| "break"       {_BREAK              (spos lexbuf, epos lexbuf)}
-| "let"         {_LET                (spos lexbuf, epos lexbuf)}
-| "in"          {_IN                 (spos lexbuf, epos lexbuf)}
-| "end"         {_END                (spos lexbuf, epos lexbuf)}
-| "function"    {_FUNCTION           (spos lexbuf, epos lexbuf)}
-| "var"         {_VAR                (spos lexbuf, epos lexbuf)}
-| "type"        {_TYPE               (spos lexbuf, epos lexbuf)}
-| "array"       {_ARRAY              (spos lexbuf, epos lexbuf)}
-| "if"          {_IF                 (spos lexbuf, epos lexbuf)}
-| "then"        {_THEN               (spos lexbuf, epos lexbuf)}
-| "else"        {_ELSE               (spos lexbuf, epos lexbuf)}
-| "do"          {_DO                 (spos lexbuf, epos lexbuf)}
-| "of"          {_OF                 (spos lexbuf, epos lexbuf)}
-| "nil"         {_NIL                (spos lexbuf, epos lexbuf)}
-| ","           {_COMMA              (spos lexbuf, epos lexbuf)}
-| ":"           {_COLON              (spos lexbuf, epos lexbuf)}
-| ";"           {_SEMICOLON          (spos lexbuf, epos lexbuf)}
-| "("           {_LPAREN             (spos lexbuf, epos lexbuf)}
-| ")"           {_RPAREN             (spos lexbuf, epos lexbuf)}
-| "["           {_LBRACE             (spos lexbuf, epos lexbuf)}
-| "]"           {_RBRACE             (spos lexbuf, epos lexbuf)}
-| "{"           {_LBRACK             (spos lexbuf, epos lexbuf)}
-| "}"           {_RBRACK             (spos lexbuf, epos lexbuf)}
-| "."           {_DOT                (spos lexbuf, epos lexbuf)}
-| "+"           {_PLUS               (spos lexbuf, epos lexbuf)}
-| "-"           {_MINUS              (spos lexbuf, epos lexbuf)}
-| "*"           {_TIMES              (spos lexbuf, epos lexbuf)}
-| "/"           {_DIVIDE             (spos lexbuf, epos lexbuf)}
-| "="           {_EQ                 (spos lexbuf, epos lexbuf)}
-| "<>"          {_NEQ                (spos lexbuf, epos lexbuf)}
-| "<"           {_LT                 (spos lexbuf, epos lexbuf)}
-| "<="          {_LE                 (spos lexbuf, epos lexbuf)}
-| ">"           {_GT                 (spos lexbuf, epos lexbuf)}
-| ">="          {_GE                 (spos lexbuf, epos lexbuf)}
-| "&"           {_AND                (spos lexbuf, epos lexbuf)}
-| "|"           {_OR                 (spos lexbuf, epos lexbuf)}
-| ":="          {_ASSIGN             (spos lexbuf, epos lexbuf)}
-| '='           {_EQ                 (spos lexbuf, epos lexbuf)}
+| "while"       {WHILE              (spos lexbuf, epos lexbuf)}
+| "for"         {FOR                (spos lexbuf, epos lexbuf)}
+| "to"          {TO                 (spos lexbuf, epos lexbuf)}
+| "break"       {BREAK              (spos lexbuf, epos lexbuf)}
+| "let"         {LET                (spos lexbuf, epos lexbuf)}
+| "in"          {IN                 (spos lexbuf, epos lexbuf)}
+| "end"         {END                (spos lexbuf, epos lexbuf)}
+| "function"    {FUNCTION           (spos lexbuf, epos lexbuf)}
+| "var"         {VAR                (spos lexbuf, epos lexbuf)}
+| "type"        {TYPE               (spos lexbuf, epos lexbuf)}
+| "array"       {ARRAY              (spos lexbuf, epos lexbuf)}
+| "if"          {IF                 (spos lexbuf, epos lexbuf)}
+| "then"        {THEN               (spos lexbuf, epos lexbuf)}
+| "else"        {ELSE               (spos lexbuf, epos lexbuf)}
+| "do"          {DO                 (spos lexbuf, epos lexbuf)}
+| "of"          {OF                 (spos lexbuf, epos lexbuf)}
+| "nil"         {NIL                (spos lexbuf, epos lexbuf)}
+| ","           {COMMA              (spos lexbuf, epos lexbuf)}
+| ":"           {COLON              (spos lexbuf, epos lexbuf)}
+| ";"           {SEMICOLON          (spos lexbuf, epos lexbuf)}
+| "("           {LPAREN             (spos lexbuf, epos lexbuf)}
+| ")"           {RPAREN             (spos lexbuf, epos lexbuf)}
+| "["           {LBRACE             (spos lexbuf, epos lexbuf)}
+| "]"           {RBRACE             (spos lexbuf, epos lexbuf)}
+| "{"           {LBRACK             (spos lexbuf, epos lexbuf)}
+| "}"           {RBRACK             (spos lexbuf, epos lexbuf)}
+| "."           {DOT                (spos lexbuf, epos lexbuf)}
+| "+"           {PLUS               (spos lexbuf, epos lexbuf)}
+| "-"           {MINUS              (spos lexbuf, epos lexbuf)}
+| "*"           {TIMES              (spos lexbuf, epos lexbuf)}
+| "/"           {DIVIDE             (spos lexbuf, epos lexbuf)}
+| "="           {EQ                 (spos lexbuf, epos lexbuf)}
+| "<>"          {NEQ                (spos lexbuf, epos lexbuf)}
+| "<"           {LT                 (spos lexbuf, epos lexbuf)}
+| "<="          {LE                 (spos lexbuf, epos lexbuf)}
+| ">"           {GT                 (spos lexbuf, epos lexbuf)}
+| ">="          {GE                 (spos lexbuf, epos lexbuf)}
+| "&"           {AND                (spos lexbuf, epos lexbuf)}
+| "|"           {OR                 (spos lexbuf, epos lexbuf)}
+| ":="          {ASSIGN             (spos lexbuf, epos lexbuf)}
+| '='           {EQ                 (spos lexbuf, epos lexbuf)}
 | '"'           {read_str (Buffer.create 80) lexbuf}
-| id            {_ID                 (lexeme lexbuf,spos lexbuf, epos lexbuf)}
-| integers      {_INT                (int_of_string (lexeme lexbuf), spos lexbuf, epos lexbuf)}
+| id            {ID                 (lexeme lexbuf,spos lexbuf, epos lexbuf)}
+| integers      {INT                (int_of_string (lexeme lexbuf), spos lexbuf, epos lexbuf)}
 | "/*"          {comment 1 lexbuf}
 | _             {raise (SyntaxError ("Undefined: " ^ lexeme lexbuf))}
 | eof           {raise Eof}
@@ -78,7 +78,7 @@ and comment depth = parse
 | eof           {raise (SyntaxError "Comments not closed")}
 
 and read_str strbuf = parse
-| '"'           {_STRING             (Buffer.contents strbuf,spos lexbuf, epos lexbuf)}
+| '"'           {STRING             (Buffer.contents strbuf,spos lexbuf, epos lexbuf)}
 | '\\' 'n'      {Buffer.add_char strbuf '\n'; read_str strbuf lexbuf}
 | '\\' 't'      {Buffer.add_char strbuf '\t'; read_str strbuf lexbuf}
 

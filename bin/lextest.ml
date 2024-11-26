@@ -1,12 +1,14 @@
+open Lex
+
 let () =
   try
     let lexbuf = Lexing.from_channel stdin in
     while true do
-      let res = Lex.Tiger.read lexbuf in
-      Format.printf "%s%!" res
+      let res = Tiger.read lexbuf in
+      Format.printf "%s%!" @@ Tokens.show_realtoken res
     done
   with
-  | Lex.Tiger.Eof ->
+  | Tiger.Eof ->
     Format.printf "\n";
     exit 0
 ;;
