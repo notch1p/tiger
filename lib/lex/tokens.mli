@@ -1,9 +1,12 @@
 type linenum = int
+
 val pp_linenum : Format.formatter -> linenum -> unit
 val show_linenum : linenum -> string
+
 type token = string
+
 type realtoken =
-    TYPE of linenum * linenum
+  | TYPE of linenum * linenum
   | VAR of linenum * linenum
   | FUNCTION of linenum * linenum
   | BREAK of linenum * linenum
@@ -47,6 +50,7 @@ type realtoken =
   | INT of linenum * linenum * linenum
   | ID of token * linenum * linenum
   | EOF of linenum * linenum
+
 val pp_realtoken : Format.formatter -> realtoken -> unit
 val show_realtoken : realtoken -> string
 val _TYPE : linenum * linenum -> string

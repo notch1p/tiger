@@ -13,6 +13,7 @@ depends: [
   "core"
   "menhir"
   "ppx_deriving"
+  "ocolor"
   "odoc" {with-doc}
 ]
 build: [
