@@ -5,7 +5,7 @@ let () =
     (fun i x ->
       if i <> 0
       then (
-        Ocolor_format.printf "\n@{<ul;bold>File \"%s\"@}:%!" x;
+        Ocolor_format.printf "\n@{<yellow;it>File \"%s\"@}:%!" x;
         let file = open_in x in
         try
           let lexbuf = Lexing.from_channel file in
