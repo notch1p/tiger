@@ -51,9 +51,9 @@ let rec maxargs = function
   | PrintStm e ->
     List.fold_left
       (fun a esub ->
-        match esub with
-        | EseqExp (s, _) -> max (maxargs s) a
-        | _ -> a)
+         match esub with
+         | EseqExp (s, _) -> max (maxargs s) a
+         | _ -> a)
       (List.length e)
       e
   | CompoundStm (s1, s2) -> max (maxargs s1) (maxargs s2)

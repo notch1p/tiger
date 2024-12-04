@@ -15,10 +15,10 @@ let letter       = ['a'-'z' 'A'-'Z']
 let id           = letter+ (di | letter | '_')*
 
 rule read = parse
-| whitespace+   {_DEBUG_NONPRINTABLE (lexeme lexbuf)
-                 ; read lexbuf}
-| newline       {_DEBUG_NONPRINTABLE (lexeme lexbuf)
-                 ; new_line lexbuf
+| whitespace+   { (* _DEBUG_NONPRINTABLE (lexeme lexbuf) *)
+                   read lexbuf}
+| newline       { (* _DEBUG_NONPRINTABLE (lexeme lexbuf) *)
+                   new_line lexbuf
                  ; read lexbuf}
 | "while"       {WHILE              (spos lexbuf, epos lexbuf)}
 | "for"         {FOR                (spos lexbuf, epos lexbuf)}
@@ -69,7 +69,7 @@ rule read = parse
                                      , spos lexbuf
                                      , epos lexbuf)}
 | "/*"          {comment 1 lexbuf; read lexbuf}
-| _             {emit_error lexbuf (SyntaxError ("Undefined identifier")); read lexbuf}
+| _             {emit_error lexbuf (SyntaxError ("Illegal character")); read lexbuf}
 | eof           {raise Eof}
 
 
@@ -85,11 +85,13 @@ and comment depth = parse
 
 and read_str spos strbuf = parse
 | '"'           {STRING             (Buffer.contents strbuf, spos, epos lexbuf)}
+| newline       {new_line lexbuf; Buffer.add_char strbuf '\n'; read_str spos strbuf lexbuf}
+| '\\' 'n'      {Buffer.add_char strbuf '\n'; read_str spos strbuf lexbuf}
+| '\\' 't'      {Buffer.add_char strbuf '\t'; read_str spos strbuf lexbuf}
+
 | '\\' newline  {new_line lexbuf; handle_nonprintable lexbuf; read_str spos strbuf lexbuf}
 | '\\' whitespace
                 {handle_nonprintable lexbuf;  read_str spos strbuf lexbuf}
-| '\\' 'n'      {Buffer.add_char strbuf '\n'; read_str spos strbuf lexbuf}
-| '\\' 't'      {Buffer.add_char strbuf '\t'; read_str spos strbuf lexbuf}
 
 | '\\' (di as d1) (di as d2) (di as d3)
                 {let code = (Char.code d1 - Char.code '0') * 100 + 
@@ -102,9 +104,9 @@ and read_str spos strbuf = parse
 | '\\' '\\'     {Buffer.add_char strbuf '\\'; read_str spos strbuf lexbuf}
 
 
-| [^ '\\' '"']+ {Buffer.add_string strbuf (lexeme lexbuf); read_str spos strbuf lexbuf}
+| [^ '\\' '"' '\n']+ {Buffer.add_string strbuf (lexeme lexbuf); read_str spos strbuf lexbuf}
 | '\\' [^ '\n']
-                {emit_error ~offset:(-1) lexbuf (SyntaxError ("Undefined escape sequence")); read_str spos strbuf lexbuf}
+                {emit_error lexbuf (SyntaxError ("Undefined escape sequence")); read_str spos strbuf lexbuf}
 | _             {raise (SyntaxError ("Uncaught error when lexing string"))}
 | eof           {raise (SyntaxError ("Expecting closing quote"))}
 
@@ -112,6 +114,7 @@ and handle_nonprintable = parse
 | '\\'          {()}
 | newline       {new_line lexbuf; handle_nonprintable lexbuf}
 | whitespace    {handle_nonprintable lexbuf}
-| "/*"          {comment 1 lexbuf}
-| _             {emit_error lexbuf (SyntaxError ("Garbage within \\...\\ as only non-printable characters are allowed here"))}
+| "/*"          {comment 1 lexbuf; handle_nonprintable lexbuf}
+| [^ '\r' '\n' ' ' '\t' '\\' ]+             
+                {emit_error lexbuf (SyntaxError ("Garbage within \\...\\, only non-printable characters are allowed here")); handle_nonprintable lexbuf}
 | eof           {emit_error lexbuf (SyntaxError ("Unclosed multiline ignore sequence"))}
