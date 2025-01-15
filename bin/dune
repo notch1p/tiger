@@ -1,4 +1,4 @@
-(executable
- (public_name tigerlex)
- (name lextest)
- (libraries core lex ocolor))
+(executables
+ (names lextest parsetest)
+ (public_names lextest parsetest)
+ (libraries core lex syntax menhirLib))

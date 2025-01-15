@@ -1,0 +1,15 @@
+#!/bin/bash
+PREFIX="tiger-src/testcases"
+case "$1" in
+"lextest")
+    echo "Testing lexer -- There should not be any error"
+    ;;
+"parsetest")
+    echo "Testing parser -- There should not be any error except test49"
+    ;;
+*)
+    echo "Undefined target $1"
+    exit 1
+    ;;
+esac
+dune exec "$1" ${PREFIX}/*

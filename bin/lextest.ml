@@ -5,15 +5,12 @@ let () =
     (fun i x ->
        if i <> 0
        then (
-         Ocolor_format.printf "\n@{<yellow;it>File \"%s\"@}:%!" x;
          let file = open_in x in
          try
            let lexbuf = Lexing.from_channel file in
            Lexing.set_filename lexbuf x;
            while true do
-             let res = Tiger.read lexbuf in
-             (* ignore res *)
-             Format.printf "%s%!" @@ Tokens.show_realtoken res
+             Tiger.read lexbuf |> ignore (* ignore res *)
            done
          with
          | Tiger.Eof -> close_in file))

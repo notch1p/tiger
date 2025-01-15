@@ -1,7 +1,8 @@
 {
 open Lexing
-open Tokens
 open Errormsg
+open Syntax.Tiger
+
 exception Eof
 let (spos, epos) = (lexeme_start, lexeme_end)
 let _DEBUG_NONPRINTABLE s = Format.printf "%s%!" s
@@ -20,54 +21,50 @@ rule read = parse
 | newline       { (* _DEBUG_NONPRINTABLE (lexeme lexbuf) *)
                    new_line lexbuf
                  ; read lexbuf}
-| "while"       {WHILE              (spos lexbuf, epos lexbuf)}
-| "for"         {FOR                (spos lexbuf, epos lexbuf)}
-| "to"          {TO                 (spos lexbuf, epos lexbuf)}
-| "break"       {BREAK              (spos lexbuf, epos lexbuf)}
-| "let"         {LET                (spos lexbuf, epos lexbuf)}
-| "in"          {IN                 (spos lexbuf, epos lexbuf)}
-| "end"         {END                (spos lexbuf, epos lexbuf)}
-| "function"    {FUNCTION           (spos lexbuf, epos lexbuf)}
-| "var"         {VAR                (spos lexbuf, epos lexbuf)}
-| "type"        {TYPE               (spos lexbuf, epos lexbuf)}
-| "array"       {ARRAY              (spos lexbuf, epos lexbuf)}
-| "if"          {IF                 (spos lexbuf, epos lexbuf)}
-| "then"        {THEN               (spos lexbuf, epos lexbuf)}
-| "else"        {ELSE               (spos lexbuf, epos lexbuf)}
-| "do"          {DO                 (spos lexbuf, epos lexbuf)}
-| "of"          {OF                 (spos lexbuf, epos lexbuf)}
-| "nil"         {NIL                (spos lexbuf, epos lexbuf)}
-| ","           {COMMA              (spos lexbuf, epos lexbuf)}
-| ":"           {COLON              (spos lexbuf, epos lexbuf)}
-| ";"           {SEMICOLON          (spos lexbuf, epos lexbuf)}
-| "("           {LPAREN             (spos lexbuf, epos lexbuf)}
-| ")"           {RPAREN             (spos lexbuf, epos lexbuf)}
-| "["           {LBRACE             (spos lexbuf, epos lexbuf)}
-| "]"           {RBRACE             (spos lexbuf, epos lexbuf)}
-| "{"           {LBRACK             (spos lexbuf, epos lexbuf)}
-| "}"           {RBRACK             (spos lexbuf, epos lexbuf)}
-| "."           {DOT                (spos lexbuf, epos lexbuf)}
-| "+"           {PLUS               (spos lexbuf, epos lexbuf)}
-| "-"           {MINUS              (spos lexbuf, epos lexbuf)}
-| "*"           {TIMES              (spos lexbuf, epos lexbuf)}
-| "/"           {DIVIDE             (spos lexbuf, epos lexbuf)}
-| "="           {EQ                 (spos lexbuf, epos lexbuf)}
-| "<>"          {NEQ                (spos lexbuf, epos lexbuf)}
-| "<"           {LT                 (spos lexbuf, epos lexbuf)}
-| "<="          {LE                 (spos lexbuf, epos lexbuf)}
-| ">"           {GT                 (spos lexbuf, epos lexbuf)}
-| ">="          {GE                 (spos lexbuf, epos lexbuf)}
-| "&"           {AND                (spos lexbuf, epos lexbuf)}
-| "|"           {OR                 (spos lexbuf, epos lexbuf)}
-| ":="          {ASSIGN             (spos lexbuf, epos lexbuf)}
-| '='           {EQ                 (spos lexbuf, epos lexbuf)}
+| "while"       {WHILE    }
+| "for"         {FOR      }
+| "to"          {TO       }
+| "break"       {BREAK    }
+| "let"         {LET      }
+| "in"          {IN       }
+| "end"         {END      }
+| "function"    {FUNCTION }
+| "var"         {VAR      }
+| "type"        {TYPE     }
+| "array"       {ARRAY    }
+| "if"          {IF       }
+| "then"        {THEN     }
+| "else"        {ELSE     }
+| "do"          {DO       }
+| "of"          {OF       }
+| "nil"         {NIL      }
+| ","           {COMMA    }
+| ":"           {COLON    }
+| ";"           {SEMICOLON}
+| "("           {LPAREN   }
+| ")"           {RPAREN   }
+| "["           {LBRACE   }
+| "]"           {RBRACE   }
+| "{"           {LBRACK   }
+| "}"           {RBRACK   }
+| "."           {DOT      }
+| "+"           {PLUS     }
+| "-"           {MINUS    }
+| "*"           {TIMES    }
+| "/"           {DIVIDE   }
+| "="           {EQ       }
+| "<>"          {NEQ      }
+| "<"           {LT       }
+| "<="          {LE       }
+| ">"           {GT       }
+| ">="          {GE       }
+| "&"           {AND      }
+| "|"           {OR       }
+| ":="          {ASSIGN   }
+| '='           {EQ       }
 | '"'           {read_str (spos lexbuf) (Buffer.create 80) lexbuf}
-| id            {ID                 (lexeme lexbuf
-                                     , spos lexbuf
-                                     , epos lexbuf)}
-| integers      {INT                (int_of_string (lexeme lexbuf)
-                                     , spos lexbuf
-                                     , epos lexbuf)}
+| id            {ID (lexeme lexbuf)}
+| integers      {INT(int_of_string @@ lexeme lexbuf)}
 | "/*"          {comment 1 lexbuf; read lexbuf}
 | _             {emit_error lexbuf (SyntaxError ("Illegal character")); read lexbuf}
 | eof           {raise Eof}
@@ -84,7 +81,7 @@ and comment depth = parse
 | eof                     {raise (SyntaxError "Unclosed comments")}
 
 and read_str spos strbuf = parse
-| '"'           {STRING             (Buffer.contents strbuf, spos, epos lexbuf)}
+| '"'           {STRING (Buffer.contents strbuf)}
 | newline       {new_line lexbuf; Buffer.add_char strbuf '\n'; read_str spos strbuf lexbuf}
 | '\\' 'n'      {Buffer.add_char strbuf '\n'; read_str spos strbuf lexbuf}
 | '\\' 't'      {Buffer.add_char strbuf '\t'; read_str spos strbuf lexbuf}

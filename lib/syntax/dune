@@ -1,0 +1,7 @@
+(menhir
+ (modules tiger)
+ (flags -la 2 --table))
+
+(library
+ (name syntax)
+ (libraries core menhirLib))
