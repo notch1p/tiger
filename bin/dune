@@ -1,4 +1,10 @@
 (executables
- (names lextest parsetest)
- (public_names lextest parsetest)
- (libraries core lex syntax menhirLib))
+ (names parsetest)
+ (public_names parsetest)
+ (libraries core lex syntax menhirLib)
+ (link_deps ../lib/syntax/parserError.check))
+
+(executables
+ (names lextest)
+ (public_names lextest)
+ (libraries core lex syntax))

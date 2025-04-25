@@ -1,6 +1,6 @@
 {
 open Lexing
-open Errormsg
+open Syntax.Errormsg
 open Syntax.Tiger
 
 exception Eof
@@ -66,7 +66,7 @@ rule read = parse
 | id            {ID (lexeme lexbuf)}
 | integers      {INT(int_of_string @@ lexeme lexbuf)}
 | "/*"          {comment 1 lexbuf; read lexbuf}
-| _             {emit_error lexbuf (SyntaxError ("Illegal character")); read lexbuf}
+| _             {emit_error lexbuf (SyntaxError ("Illegal character")); exit 1}
 | eof           {raise Eof}
 
 

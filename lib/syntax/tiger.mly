@@ -144,6 +144,7 @@ tdefs:
 funcall:
 | fid "(" ")"                                       {}
 | fid "(" exprc ")"                                 {}
+| fid ID+                                           {}
 %inline fid: ID                                     {}
 
 arith:

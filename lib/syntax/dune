@@ -1,7 +1,30 @@
 (menhir
  (modules tiger)
- (flags -la 2 --table))
+ (flags -la 2 -t --comment))
 
 (library
  (name syntax)
- (libraries core menhirLib))
+ (libraries core ocolor menhirLib))
+
+(rule
+ (deps parserError.check)
+ (action
+  (with-stdout-to
+   parserError.ml
+   (run menhir %{dep:tiger.mly} --compile-errors %{dep:parserError.messages}))))
+
+(rule
+ (with-stdout-to
+  parserError.auto.messages
+  (run menhir %{dep:tiger.mly} --list-errors)))
+
+(rule
+ (with-stdout-to
+  parserError.check
+  (run
+   menhir
+   %{dep:tiger.mly}
+   --compare-errors
+   %{dep:parserError.auto.messages}
+   --compare-errors
+   %{dep:parserError.messages})))
