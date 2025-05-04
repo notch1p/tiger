@@ -54,18 +54,25 @@ let[@warning "-32"] rec loop_handle' succeed fail read checkpoint =
 let definition_or_else (tok : Syntax.Tiger.token) =
   match tok with
   | LET | FUNCTION -> `Def
-  | SEMICOLON | RPAREN | RBRACK -> `Expr
+  | SEMICOLON | RPAREN | RBRACK | END -> `Expr
   | _ -> `Nop
 ;;
 
-let rec skipping_until_valid (sup : I.supplier) =
-  let tok, _, _ = sup () in
+let rec skipping_until_valid (sup : I.supplier) cp =
+  let ((tok, _, _) as offer_tok) = sup () in
   match tok |> definition_or_else with
-  | `Def | `Expr -> sup
-  | `Nop -> skipping_until_valid sup
+  | `Def -> I.offer cp offer_tok, sup
+  | `Expr -> cp, sup
+  | `Nop -> skipping_until_valid sup cp
 ;;
 
-let rec loop_handle_undo' succeed fail read (inputneeded, checkpoint, last_red_cp) err_rec
+let rec loop_handle_undo'
+          succeed
+          fail
+          read
+          (inputneeded, checkpoint, last_red_cp)
+          err_rec
+          err_num
   =
   let open I in
   match checkpoint with
@@ -74,7 +81,13 @@ let rec loop_handle_undo' succeed fail read (inputneeded, checkpoint, last_red_c
     let inputneeded = checkpoint in
     let triple = read () in
     let checkpoint = offer checkpoint triple in
-    loop_handle_undo' succeed fail read (inputneeded, checkpoint, last_red_cp) err_rec
+    loop_handle_undo'
+      succeed
+      fail
+      read
+      (inputneeded, checkpoint, last_red_cp)
+      err_rec
+      err_num
   | Shifting _ ->
     loop_handle_undo'
       succeed
@@ -82,24 +95,28 @@ let rec loop_handle_undo' succeed fail read (inputneeded, checkpoint, last_red_c
       read
       (inputneeded, resume checkpoint, last_red_cp)
       err_rec
+      err_num
   | AboutToReduce _ ->
     (* Which strategy is passed to [resume] here is irrelevant,
          since this checkpoint is not [HandlingError _]. *)
     let checkpoint = resume checkpoint in
-    loop_handle_undo' succeed fail read (inputneeded, checkpoint, inputneeded) err_rec
-  | Rejected | HandlingError _ ->
-    let warnmsg =
-      if err_rec
-      then "This diagnostic message may not be as accurate"
-      else ""
-    in
-    let () = fail inputneeded checkpoint warnmsg in
     loop_handle_undo'
       succeed
       fail
-      (skipping_until_valid read)
-      (inputneeded, last_red_cp, last_red_cp)
-      true
+      read
+      (inputneeded, checkpoint, inputneeded)
+      err_rec
+      err_num
+  | Rejected | HandlingError _ ->
+    if err_num > 3
+    then Printf.eprintf "Too many errors. Abort."
+    else (
+      let warnmsg =
+        if err_rec then "This diagnostic message may not be as accurate" else ""
+      in
+      let () = fail inputneeded checkpoint warnmsg in
+      let cp, sup = skipping_until_valid read last_red_cp in
+      loop_handle_undo' succeed fail sup (inputneeded, cp, last_red_cp) true (err_num + 1))
   (*| Rejected -> fail inputneeded checkpoint*)
   | Accepted v -> succeed v
 ;;
@@ -116,7 +133,13 @@ let () =
          let buf, sup = E.wrap_supplier sup in
          let cp = prog lexbuf.lex_curr_p in
          try
-           loop_handle_undo' (fun _ -> ()) (fail' buf lexbuf.lex_buffer) sup (cp, cp, cp) false
+           loop_handle_undo'
+             (fun _ -> ())
+             (fail' buf lexbuf.lex_buffer)
+             sup
+             (cp, cp, cp)
+             false
+             0
          with
          | Eof -> ()))
     Sys.argv

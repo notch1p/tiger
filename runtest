@@ -7,7 +7,7 @@ for m in "$@"; do
     echo "Testing lexer -- There should not be any error"
     ;;
   "parsetest")
-    echo "Testing parser -- There should not be any error except test49"
+    echo "Testing parser -- There should not be any error"
     ;;
   *)
     echo "Undefined target $1"

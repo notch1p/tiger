@@ -44,14 +44,14 @@
 %token          VAR          "var"
 %token          TYPE         "type"
 
-%nonassoc           ":="
+%nonassoc           ":=" "do" "of" "then"
+%right              "else"
 %left               "|"
 %left               "&"
 %nonassoc           "=" "<>" ">" "<" ">=" "<="
 %left               "+" "-"
 %left               "*" "/"
 %left               UMINUS
-
 // %start          expr
 %start <unit> prog
 
@@ -99,6 +99,7 @@ fundec:
 
 // expressions
 expr:
+| INT                                               {}
 | lvalue                                            {}
 | NIL                                               {}
 | "(" ")"                                           {}
@@ -137,18 +138,24 @@ assignment:
 instOfRec:
 | tid "{" tdefs "}"                                 {}
 tdefs: 
-|
+| {}
 | ID "=" expr                                       {} 
 | tdefs "," ID "=" expr                             {}
 
+argvalue :
+| INT {}
+| STRING {}
+| lvalue {}
+| NIL {}
+| "(" ")" {}
+| "(" exprc ")" {}
+
+
 funcall:
-| fid "(" ")"                                       {}
-| fid "(" exprc ")"                                 {}
-| fid ID+                                           {}
-%inline fid: ID                                     {}
+| lvalue argvalue  {}
+| funcall argvalue {}
 
 arith:
-| INT                                               {}
 | expr "+" expr                                     {}
 | expr "-" expr                                     {}
 | expr "*" expr                                     {}
@@ -162,6 +169,7 @@ exprs:
 exprc:
 | expr                                              {}
 | exprc "," expr                                    {}
+
 
 (*
 lvalue' -> ID
