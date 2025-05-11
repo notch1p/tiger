@@ -32,7 +32,7 @@ prog: MINUS VAR
 ## MINUS
 ##
 
-[E002]Expecting expression
+[E002]Expecting an arithmetic expression
 
 prog: LPAREN VAR
 ##
@@ -45,7 +45,8 @@ prog: LPAREN VAR
 ## LPAREN
 ##
 
-[E003]Expecting expressions or RPAREN
+[E003]Unclosed LPAREN, Expecting expressions or RPAREN
+Note: () -- a unit value. (e1; e2; ...) -- a seq.
 
 prog: LET WHILE
 ##
@@ -60,7 +61,10 @@ prog: LET WHILE
 ## LET decs
 ##
 
-[E004]Expecting definition
+[E004]Let-expression ended abruptly.
+Note: variable bindings and expressions are separated by IN.
+Note: A valid letexp looks like
+`let var x := 1 in println x end`
 
 prog: LET VAR WHILE
 ##
@@ -73,7 +77,10 @@ prog: LET VAR WHILE
 ## VAR
 ##
 
-[E005]Expecting a symbol followed by definition
+[E005]Variable definition ended abruptly. Expecting ID ASSIGN followed by an expression.
+Note: A valid vardec looks like
+(between LET and IN) `...var id := 1...(more decs)`
+                             ~~~~^ (ID ASSIGN)
 
 prog: LET VAR ID WHILE
 ##
@@ -86,7 +93,14 @@ prog: LET VAR ID WHILE
 ## VAR ID
 ##
 
-[E006]Expecting definition
+[E006]Variable definition ended abruptly. 
+Expecting (-optionally type annotation and-) ASSIGN followed by an expression.
+Note: A valid vardec looks like
+(between LET and IN) `...var id := 1...(more decs)` -- inferred type
+(between LET and IN) `...var id : Int := 1...(more decs)`
+                                ~~~~^ (explicit type annotation)
+
+
 
 prog: LET VAR ID COLON WHILE
 ##
@@ -98,7 +112,10 @@ prog: LET VAR ID COLON WHILE
 ## VAR ID COLON
 ##
 
-[E007]Unexpected COLON, expecting definition
+[E007]Variable definition ended abruptly. Expecting a type.
+Note: A valid vardec looks like
+(between LET and IN) `...var id : Int := 1...(more decs)`
+
 
 prog: LET VAR ID COLON ID WHILE
 ##
@@ -110,7 +127,10 @@ prog: LET VAR ID COLON ID WHILE
 ## VAR ID COLON ID
 ##
 
-[E008]Expecting definition
+[E008]Variable definition ended abruptly. Expecting ASSIGN.
+Note: A valid vardec looks like
+(between LET and IN) `...var id := 1...(more decs)`
+
 
 prog: LET VAR ID COLON ID ASSIGN VAR
 ##
@@ -122,7 +142,10 @@ prog: LET VAR ID COLON ID ASSIGN VAR
 ## VAR ID COLON ID ASSIGN
 ##
 
-[E009]Expecting definition
+[E009]Variable definition ended abruptly. Expecting a expression (body)
+Note: A valid vardec looks like
+(between LET and IN) `...var id := cond c e1 e2 ...(more decs)`
+                                   ~~~~~~~~~~~^ (body) 
 
 prog: IF VAR
 ##
@@ -135,7 +158,10 @@ prog: IF VAR
 ## IF
 ##
 
-[E010]Expecting expression
+[E010]Malformed if-then-else. Expecting a expression (condition)
+Note: A valid ite looks like
+`if p x then true else false`
+    ~~^ (condition)
 
 prog: ID WHILE
 ##
@@ -149,7 +175,12 @@ prog: ID WHILE
 ## ID
 ##
 
-[E011]Unexpected token
+[E011]Unexpected token after '$0'. An ID constitutes
+  ID DOT ID         -- record accessor
+  ID [expr]         -- array accessor
+  ID [expr] of expr -- array instantiation iff ID is a type
+  ID {tdefs}        -- record instantiation iff ID is a type
+
 
 prog: ID LPAREN VAR
 ##
@@ -162,7 +193,10 @@ prog: ID LPAREN VAR
 ## LPAREN
 ##
 
-[E012]Unclosed LPAREN
+[E012]Malformed argument value. Expecting one of the following:
+  ()            -- Unit              Note: Add             RPAREN
+  (e)           -- an expr           Note: Add expr        RPAREN
+  (e1, e2, ...) -- an tuple of exprs Note: Add expr[,expr] RPAREN
 
 prog: FOR WHILE
 ##
@@ -174,7 +208,10 @@ prog: FOR WHILE
 ## FOR
 ##
 
-[E013]Expecting ID
+[E013]For-loop ended abruptly. Expecting a ID ASSIGN e1 TO e2 (range)
+Note: A for-loop looks like
+`for i := 0 to 10 do println i`
+     ~~~~~~~~~~~^ (range)
 
 prog: FOR ID WHILE
 ##
@@ -186,7 +223,9 @@ prog: FOR ID WHILE
 ## FOR ID
 ##
 
-[E014]Expecting ASSIGN
+[E014]For-loop ended abruptly. Expecting a ASSIGN.
+Note: A for-loop looks like
+`for i := 0 to 10 do println i`
 
 prog: FOR ID ASSIGN VAR
 ##
@@ -198,7 +237,10 @@ prog: FOR ID ASSIGN VAR
 ## FOR ID ASSIGN
 ##
 
-[E015]Expecting expression
+[E015]For-loop ended abruptly. Expecting a expression (loop-body).
+Note: A for-loop looks like
+`for i := 0 to 10 do println i`
+                     ~~~~~~~~^ (loop-body)
 
 prog: ID ASSIGN VAR
 ##
@@ -210,7 +252,8 @@ prog: ID ASSIGN VAR
 ## lvalue ASSIGN
 ##
 
-[E016]Expecting expression
+[E016]The RHS of an assignment is an expr.
+Note: An assignment looks like `x := e`
 
 prog: ID ASSIGN INT WHILE
 ##
@@ -234,7 +277,7 @@ prog: ID ASSIGN INT WHILE
 ## lvalue ASSIGN expr
 ##
 
-[E017]Unexpected token
+[E017]Unexpected token after '$0'
 
 prog: INT TIMES VAR
 ##
@@ -246,7 +289,7 @@ prog: INT TIMES VAR
 ## expr TIMES
 ##
 
-[E018]Expecting expression
+[E018]Unexpected token after '$0'. Expecting an arithmetic expression.
 
 prog: INT PLUS VAR
 ##
@@ -258,7 +301,7 @@ prog: INT PLUS VAR
 ## expr PLUS
 ##
 
-[E019]Expecting expression
+[E019]Unexpected token after '$0'. Expecting an arithmetic expression.
 
 prog: INT PLUS INT WHILE
 ##
@@ -282,7 +325,7 @@ prog: INT PLUS INT WHILE
 ## expr PLUS expr
 ##
 
-[E020]Unexpected token
+[E020]Unexpected token after '$0'. Expecting an arithmetic or comparing expression
 
 prog: INT DIVIDE VAR
 ##
@@ -294,7 +337,7 @@ prog: INT DIVIDE VAR
 ## expr DIVIDE
 ##
 
-[E021]Expecting expression
+[E021]Unexpected token after '$0'. Expecting an arithmetic expression
 
 prog: INT OR VAR
 ##
@@ -306,7 +349,7 @@ prog: INT OR VAR
 ## expr OR
 ##
 
-[E022]Expecting expression
+[E022]Unexpected token after '$0'. Expecting an expression
 
 prog: INT OR INT WHILE
 ##
@@ -330,7 +373,7 @@ prog: INT OR INT WHILE
 ## expr OR expr
 ##
 
-[E023]Unexpected token
+[E023]Unexpected token after '$0'. Expecting an arithmetic or comparing expression
 
 prog: INT NEQ VAR
 ##
@@ -342,7 +385,7 @@ prog: INT NEQ VAR
 ## expr NEQ
 ##
 
-[E024]Expecting expression
+[E024]Unexpected token after '$0'. Expecting an arithmetic expression
 
 prog: INT NEQ INT WHILE
 ##
@@ -366,7 +409,7 @@ prog: INT NEQ INT WHILE
 ## expr NEQ expr
 ##
 
-[E025]Unexpected token
+[E025]Unexpected token after '$0'. Expecting an arithmetic or comparing expression.
 
 prog: INT MINUS VAR
 ##
@@ -378,7 +421,7 @@ prog: INT MINUS VAR
 ## expr MINUS
 ##
 
-[E026]Expecting expression
+[E026]Unexpected token after '$0'. Expecting an arithmetic expression.
 
 prog: INT MINUS INT WHILE
 ##
@@ -402,7 +445,7 @@ prog: INT MINUS INT WHILE
 ## expr MINUS expr
 ##
 
-[E027]Unexpected token
+[E027]Unexpected token after '$0'. Expecting an arithmetic or comparing expression
 
 prog: INT LT VAR
 ##
@@ -414,7 +457,7 @@ prog: INT LT VAR
 ## expr LT
 ##
 
-[E028]Expecting expression
+[E028]Unexpected token after '$0'. Expecting an comparing expression
 
 prog: INT LT INT WHILE
 ##
@@ -438,7 +481,7 @@ prog: INT LT INT WHILE
 ## expr LT expr
 ##
 
-[E029]Unexpected token
+[E029]Unexpected token after '$0'. Expecting an arithmetic or comparing expression.
 
 prog: INT LE VAR
 ##
@@ -450,7 +493,7 @@ prog: INT LE VAR
 ## expr LE
 ##
 
-[E030]Expecting expression
+[E030]Unexpected token after '$0'. Expecting an comparing expression
 
 prog: INT LE INT WHILE
 ##
@@ -474,7 +517,7 @@ prog: INT LE INT WHILE
 ## expr LE expr
 ##
 
-[E031]Unexpected token
+[E031]Unexpected token. Expecting an arithmetic or comparing expression 
 
 prog: INT GT VAR
 ##
@@ -486,7 +529,7 @@ prog: INT GT VAR
 ## expr GT
 ##
 
-[E032]Expecting expression
+[E032]Unexpected token after '$0'. Expecting an comparing expression
 
 prog: INT GT INT WHILE
 ##
@@ -510,7 +553,7 @@ prog: INT GT INT WHILE
 ## expr GT expr
 ##
 
-[E033]Unexpected token
+[E033]Unexpected token after '$0'. Expecting an arithmetic or comparing expression
 
 prog: INT GE VAR
 ##
@@ -522,7 +565,7 @@ prog: INT GE VAR
 ## expr GE
 ##
 
-[E034]Expecting expression
+[E034]Unexpected token after '$0'. Expecting an comparing expression
 
 prog: INT GE INT WHILE
 ##
@@ -546,7 +589,7 @@ prog: INT GE INT WHILE
 ## expr GE expr
 ##
 
-[E035]Unexpected token
+[E035]Unexpected token after '$0'. Expecting an arithmetic or comparing expression.
 
 prog: INT EQ VAR
 ##
@@ -558,7 +601,7 @@ prog: INT EQ VAR
 ## expr EQ
 ##
 
-[E036]Expecting expression
+[E036]Unexpected token after '$0'. Expecting an comparing expression
 
 prog: INT EQ INT WHILE
 ##
@@ -582,7 +625,7 @@ prog: INT EQ INT WHILE
 ## expr EQ expr
 ##
 
-[E037]Unexpected token
+[E037]Unexpected token after '$0'. Expecting an arithmetic or comparing expression
 
 prog: INT AND VAR
 ##
@@ -594,7 +637,7 @@ prog: INT AND VAR
 ## expr AND
 ##
 
-[E038]Expecting expression
+[E038]Unexpected token after '$0'. Expecting an comparing expression
 
 prog: INT AND INT WHILE
 ##
@@ -618,7 +661,7 @@ prog: INT AND INT WHILE
 ## expr AND expr
 ##
 
-[E039]Unexpected token
+[E039]Unexpected token after '$0'. Expecting an arithmetic or comparing expression.
 
 prog: FOR ID ASSIGN INT VAR
 ##
@@ -642,7 +685,9 @@ prog: FOR ID ASSIGN INT VAR
 ## FOR ID ASSIGN expr
 ##
 
-[E040]Expecting TO
+[E040]Unexpected token after '$0'. Malformed For-loop
+Note: A for-loop looks like
+`for i := 0 to 10 do println i`
 
 prog: FOR ID ASSIGN INT TO VAR
 ##
@@ -654,7 +699,10 @@ prog: FOR ID ASSIGN INT TO VAR
 ## FOR ID ASSIGN expr TO
 ##
 
-[E041]Unexpected token, expecting expression
+[E041]Unexpected token after '$0'. Expecting an expression (upper-bound)
+Note: A for-loop looks like
+`for i := 0 to 10 do println i`
+               ~^ (upper-bound)
 
 prog: FOR ID ASSIGN INT TO INT VAR
 ##
@@ -678,7 +726,7 @@ prog: FOR ID ASSIGN INT TO INT VAR
 ## FOR ID ASSIGN expr TO expr
 ##
 
-[E042]Unexpected token, expecting DO
+[E042]Unexpected token after '$0'. Expecting DO.
 
 prog: FOR ID ASSIGN INT TO INT DO VAR
 ##
@@ -690,7 +738,10 @@ prog: FOR ID ASSIGN INT TO INT DO VAR
 ## FOR ID ASSIGN expr TO expr DO
 ##
 
-[E043]Unexpected token, expecting expression
+[E043]Unexpected token after '$0'. Expecting an expression (loop-body)
+Note: A for-loop looks like
+`for i := 0 to 10 do println i`
+                     ~~~~~~~~^ (loop body)
 
 prog: FOR ID ASSIGN INT TO INT DO INT WHILE
 ##
@@ -714,7 +765,9 @@ prog: FOR ID ASSIGN INT TO INT DO INT WHILE
 ## FOR ID ASSIGN expr TO expr DO expr
 ##
 
-[E044]Unexpected token
+[E044]Have parsed a for-loop 
+  after '$0' 
+but after which the program ended abruptly. Expecting expression
 
 prog: ID LPAREN INT COMMA VAR
 ##
@@ -726,7 +779,8 @@ prog: ID LPAREN INT COMMA VAR
 ## exprc COMMA
 ##
 
-[E045]Expecting expression
+[E045]Malformed tuple.
+Note: A tuple looks like () (e) (e[,e])
 
 prog: ID LPAREN INT COMMA INT VAR
 ##
@@ -750,7 +804,8 @@ prog: ID LPAREN INT COMMA INT VAR
 ## exprc COMMA expr
 ##
 
-[E046]Unclosed LPAREN
+[E046]Malformed tuple. Unclosed LPAREN.
+Note: A tuple looks like () (e) (e[,e])
 
 prog: ID LPAREN INT VAR
 ##
@@ -774,7 +829,8 @@ prog: ID LPAREN INT VAR
 ## expr
 ##
 
-[E047]Unexpected token
+[E047]Unexpected token after '$0'.
+Note: Expecting a RPAREN if a tuple is desired.
 
 prog: ID LBRACK WHILE
 ##
@@ -786,7 +842,9 @@ prog: ID LBRACK WHILE
 ## ID LBRACK
 ##
 
-[E048]Unexpected token, expecting definitions
+[E048]Malformed record instantiation. Note that a record instance is one of the two:
+  {}                  : an empty record
+  {id = e[,id' = e']} : a record with fields id, id'...
 
 prog: ID LBRACK ID WHILE
 ##
@@ -798,7 +856,11 @@ prog: ID LBRACK ID WHILE
 ## ID
 ##
 
-[E049]Expecting definitions
+[E049]Malformed field assignment. Expecting EQ followed by expr (field-value).
+Note: to assign a field with e
+  {id = e[,id' = e']} : a record with fields id, id'...
+        ^        ~^ (field-value)
+
 
 prog: ID LBRACK ID EQ VAR
 ##
@@ -810,7 +872,11 @@ prog: ID LBRACK ID EQ VAR
 ## ID EQ
 ##
 
-[E050]Expecting definitions
+[E050]Malformed field assignment. Expecting expr (field-value).
+Note: to assign a field with e
+  {id = e[,id' = e']} : a record with fields id, id'...
+        ^        ~^ (field-value)
+
 
 prog: ID LBRACK ID EQ INT VAR
 ##
@@ -834,7 +900,7 @@ prog: ID LBRACK ID EQ INT VAR
 ## ID EQ expr
 ##
 
-[E051]Unexpected token
+[E051]Malformed record instantiation. Expecting either more fields or RBRACK
 
 prog: ID LBRACK COMMA WHILE
 ##
@@ -846,7 +912,7 @@ prog: ID LBRACK COMMA WHILE
 ## tdefs COMMA
 ##
 
-[E052]Unexpected token, expecting ID
+[E052]Malformed record instantiation. Expecting either more fields or RBRACK
 
 prog: ID LBRACK COMMA ID WHILE
 ##
@@ -858,7 +924,7 @@ prog: ID LBRACK COMMA ID WHILE
 ## tdefs COMMA ID
 ##
 
-[E053]Expecting EQ
+[E053]Malformed record instantiation. Expecting EQ.
 
 prog: ID LBRACK COMMA ID EQ VAR
 ##
@@ -870,7 +936,7 @@ prog: ID LBRACK COMMA ID EQ VAR
 ## tdefs COMMA ID EQ
 ##
 
-[E054]Unexpected token, expecting expression
+[E054]Malformed record instantiation. Expecting either more fields or RBRACK
 
 prog: ID LBRACK COMMA ID EQ INT VAR
 ##
@@ -894,7 +960,7 @@ prog: ID LBRACK COMMA ID EQ INT VAR
 ## tdefs COMMA ID EQ expr
 ##
 
-[E055]Unexpected token, expecting COMMA or RBRACK
+[E055]Unexpected token after '$0', Expecting either more fields or RBRACK.
 
 prog: ID LBRACE VAR
 ##
@@ -907,7 +973,11 @@ prog: ID LBRACE VAR
 ## ID LBRACE
 ##
 
-[E056]Expecting expression
+[E056]Unexpected token after '$0'. Malformed array instantiation.
+Note: An array instantiation is
+  `T [e1] of e2` where e1 is the number of elements
+                       T  is the type within array
+                       e2 is the initial value
 
 prog: ID LBRACE INT VAR
 ##
@@ -932,7 +1002,11 @@ prog: ID LBRACE INT VAR
 ## ID LBRACE expr
 ##
 
-[E057]Unexpected token, expecting RBRACE
+[E057]Malformed array instantiation.
+Note: An array instantiation is
+  `T [e1] of e2` where e1 is the number of elements
+                       T  is the type within array
+                       e2 is the initial value
 
 prog: ID LBRACE INT RBRACE WHILE
 ##
@@ -945,7 +1019,7 @@ prog: ID LBRACE INT RBRACE WHILE
 ## ID LBRACE expr RBRACE
 ##
 
-[E058]Unexpected token, expecting OF
+[E058]Unexpected token after '$0', expecting OF.
 
 prog: ID LBRACE INT RBRACE OF VAR
 ##
@@ -957,7 +1031,9 @@ prog: ID LBRACE INT RBRACE OF VAR
 ## ID LBRACE expr RBRACE OF
 ##
 
-[E059]Unexpected token, expecting expression
+[E059]Unexpected token after '$0', expecting expression (initial-value)
+  `T [e1] of e2`
+             ~^ (initial-value)
 
 prog: ID LBRACE INT RBRACE OF INT WHILE
 ##
@@ -981,7 +1057,9 @@ prog: ID LBRACE INT RBRACE OF INT WHILE
 ## ID LBRACE expr RBRACE OF expr
 ##
 
-[E060]Unexpected token
+[E060]Have parsed an array instantiation
+$0
+but after which the program ended abruptly. Expecting expressions
 
 prog: ID DOT ID LBRACE VAR
 ##
@@ -993,7 +1071,7 @@ prog: ID DOT ID LBRACE VAR
 ## LBRACE
 ##
 
-[E061]Expecting expression
+[E061]Unexpected token after '$0'.
 
 prog: ID DOT ID LBRACE INT VAR
 ##
@@ -1017,7 +1095,7 @@ prog: ID DOT ID LBRACE INT VAR
 ## LBRACE expr
 ##
 
-[E062]Unclosed LBRACE
+[E062]Unclosed RBRACE. Note that an array accessor is `e[e']`
 
 prog: ID DOT ID LBRACE INT RBRACE WHILE
 ##
@@ -1029,7 +1107,8 @@ prog: ID DOT ID LBRACE INT RBRACE WHILE
 ## LBRACE expr RBRACE
 ##
 
-[E063]Unexpected token
+[E063]Unexpected token after '$0'.
+Note: delete after '$0'
 
 prog: ID DOT WHILE
 ##
@@ -1041,7 +1120,8 @@ prog: ID DOT WHILE
 ## DOT
 ##
 
-[E064]Unexpected token, expecting ID
+[E064]Unexpected token after '$0'. Malformed record accessor.
+Note that a record accessor is `id[.id]`
 
 prog: ID DOT ID WHILE
 ##
@@ -1053,7 +1133,7 @@ prog: ID DOT ID WHILE
 ## DOT ID
 ##
 
-[E065]Unexpected token
+[E065]Unexpected token after '$0'. Malformed record accessor.
 
 prog: IF INT VAR
 ##
@@ -1078,7 +1158,7 @@ prog: IF INT VAR
 ## IF expr
 ##
 
-[E066]Unexpected token
+[E066]Unexpected token after '$0'. Expecting THEN.
 
 prog: ID ID WHILE
 ##
@@ -1090,7 +1170,7 @@ prog: ID ID WHILE
 ## ID
 ##
 
-[E067]Unexpected token
+[E067]Unexpected token after '$0'.
 
 prog: IF INT THEN VAR
 ##
@@ -1103,7 +1183,9 @@ prog: IF INT THEN VAR
 ## IF expr THEN
 ##
 
-[E068]Unexpected token, expecting expression
+[E068]Unexpected token after '$0'. Expecting expression (else-branch)
+  `IF c THEN e1 ELSE e2`
+                     ~^ (else-branch)
 
 prog: IF INT THEN INT WHILE
 ##
@@ -1128,7 +1210,11 @@ prog: IF INT THEN INT WHILE
 ## IF expr THEN expr
 ##
 
-[E069]Unexpected token
+[E069]Unexpected token after '$0'.
+Note: delete after '$0'.
+Note: 
+  `IF c THEN e`          : Unit (e has side effects)
+  `IF c THEN e1 ELSE e2` : T iff e1, e2 : T
 
 prog: IF INT THEN INT ELSE VAR
 ##
@@ -1140,7 +1226,12 @@ prog: IF INT THEN INT ELSE VAR
 ## IF expr THEN expr ELSE
 ##
 
-[E070]Unexpected token, expecting expression
+[E070]Unexpected token after '$0'. Expecting expression (else-branch)
+Note: 
+  `IF c THEN e`          : Unit (e has side effects)
+  `IF c THEN e1 ELSE e2` : T iff e1, e2 : T
+                     ~^ (else-branch)
+
 
 prog: IF INT THEN INT ELSE INT WHILE
 ##
@@ -1164,7 +1255,8 @@ prog: IF INT THEN INT ELSE INT WHILE
 ## IF expr THEN expr ELSE expr
 ##
 
-[E071]Unexpected token
+[E071]Unexpected token after '$0'.
+Note: delete after '$0'.
 
 prog: LET VAR ID COLON ID ASSIGN INT TO
 ##
@@ -1188,7 +1280,8 @@ prog: LET VAR ID COLON ID ASSIGN INT TO
 ## VAR ID COLON ID ASSIGN expr
 ##
 
-[E072]Unexpected token
+[E072]Unexpected token after '$0'. Expecting [VAR | TYPE | IN | FUNCTION] Malformed Letexp.
+Note: delete after '$0'.
 
 prog: LET VAR ID ASSIGN VAR
 ##
@@ -1200,7 +1293,9 @@ prog: LET VAR ID ASSIGN VAR
 ## VAR ID ASSIGN
 ##
 
-[E073]Unexpected token, expecting expression
+[E073]Variable binding ended abruptly. Expecting expression (variable-value)
+  `var id := e`
+             ^ (variable-value)
 
 prog: LET VAR ID ASSIGN INT TO
 ##
@@ -1224,7 +1319,7 @@ prog: LET VAR ID ASSIGN INT TO
 ## VAR ID ASSIGN expr
 ##
 
-[E074]Unexpected token
+[E074]Unexpected token after '$0'. Expecting [VAR | TYPE | IN | FUNCTION]. Malformed Letexp.
 
 prog: LET TYPE WHILE
 ##
@@ -1238,7 +1333,9 @@ prog: LET TYPE WHILE
 ## TYPE
 ##
 
-[E075]Unexpected token, expecting TYPE-ID
+[E075]Unexpected token after '$0', Malformed type declaration.
+Note: replace after '$0' with an fresh type identifier
+
 
 prog: LET TYPE ID WHILE
 ##
@@ -1252,7 +1349,8 @@ prog: LET TYPE ID WHILE
 ## TYPE ID
 ##
 
-[E076]Unexpected token after '$0', expecting '='
+[E076]Unexpected token after '$0', expecting EQ.
+
 
 prog: LET TYPE ID EQ WHILE
 ##
@@ -1266,7 +1364,12 @@ prog: LET TYPE ID EQ WHILE
 ## TYPE ID EQ
 ##
 
-[E077]Unexpected token, expecting type definition
+[E077]Unexpected token after '$0'. Malformed type declaration.
+Note: A type declaration is one of the three
+  type id = id              -- type alias
+  type id = {}              -- empty record
+  type id = {id:T[,id':T']} -- record
+  type id = Array of T      -- array
 
 prog: LET TYPE ID EQ LBRACK WHILE
 ##
@@ -1278,7 +1381,9 @@ prog: LET TYPE ID EQ LBRACK WHILE
 ## TYPE ID EQ LBRACK
 ##
 
-[E078]Unexpected token, expecting record definition
+[E078]Unexpected token after '$0'. Expecting tyfields or RBRACK
+Note: record decl is `type id = {id:T[,id':T']}`
+                     `type id = {}`
 
 prog: LET FUNCTION ID LPAREN ID WHILE
 ##
@@ -1290,7 +1395,9 @@ prog: LET FUNCTION ID LPAREN ID WHILE
 ## ID
 ##
 
-[E079]Unexpected token, expecting COLON
+[E079]Unexpected token after '$0'. Expecting COLON.
+Note: record decl is `type id = {id:T[,id':T']}`
+                     `type id = {}`
 
 prog: LET FUNCTION ID LPAREN ID COLON WHILE
 ##
@@ -1302,7 +1409,11 @@ prog: LET FUNCTION ID LPAREN ID COLON WHILE
 ## ID COLON
 ##
 
-[E080]Unexpected token, expecting ID
+[E080]Unexpected token after '$0'. Expecting ID (type-id)
+Note: record decl is `type id = {}`
+                     `type id = {id:T[,id':T']}`
+                                    ^      ~^ (type-id)
+
 
 prog: LET TYPE ID EQ LBRACK ID COLON ID WHILE
 ##
@@ -1315,7 +1426,9 @@ prog: LET TYPE ID EQ LBRACK ID COLON ID WHILE
 ## TYPE ID EQ LBRACK tyfields
 ##
 
-[E081]Unclosed RBRACK
+[E081]Unexpected token after '$0'. Expecting either more tyfields or RBRACK
+Note: record decl is `type id = {}`
+                     `type id = {id:T[,id':T']}`
 
 prog: LET FUNCTION ID LPAREN COMMA WHILE
 ##
@@ -1327,7 +1440,7 @@ prog: LET FUNCTION ID LPAREN COMMA WHILE
 ## tyfields COMMA
 ##
 
-[E082]Expecting definitions
+[E082]Unexpected token after '$0'. Expecting more tyfields.
 
 prog: LET FUNCTION ID LPAREN COMMA ID WHILE
 ##
@@ -1339,7 +1452,10 @@ prog: LET FUNCTION ID LPAREN COMMA ID WHILE
 ## tyfields COMMA ID
 ##
 
-[E083]Expecting COLON
+[E083]Unexpected token after '$0'. Expecting COLON followed by ID (type-id)
+Note: record decl is `type id = {id:T[,id':T']}`
+                                          ~~^ (COLON type-id)
+
 
 prog: LET FUNCTION ID LPAREN COMMA ID COLON WHILE
 ##
@@ -1351,7 +1467,9 @@ prog: LET FUNCTION ID LPAREN COMMA ID COLON WHILE
 ## tyfields COMMA ID COLON
 ##
 
-[E084]Expecting TYPE-ID
+[E084]Unexpected token after '$0'. Expecting ID (type-id)
+Note: record decl is `type id = {id:T[,id':T']}`
+                                    ^      ~^ (type-id)
 
 prog: LET TYPE ID EQ ARRAY WHILE
 ##
@@ -1363,7 +1481,8 @@ prog: LET TYPE ID EQ ARRAY WHILE
 ## TYPE ID EQ ARRAY
 ##
 
-[E085]Unexpected token, Expecting OF
+[E085]Unexpected token after '$0'. Expecting OF
+Note: array decl is `type id = array of T`
 
 prog: LET TYPE ID EQ ARRAY OF WHILE
 ##
@@ -1375,7 +1494,9 @@ prog: LET TYPE ID EQ ARRAY OF WHILE
 ## TYPE ID EQ ARRAY OF
 ##
 
-[E086]Unexpected token, Expecting ID
+[E086]Unexpected token after '$0'. Expecting ID (type-id)
+Note: array decl is `type id = array of T`
+                                        ^ (type-id)
 
 prog: LET IN VAR
 ##
@@ -1387,7 +1508,7 @@ prog: LET IN VAR
 ## LET decs IN
 ##
 
-[E087]Expecting expression
+[E087]Unexpected token after '$0'. Expecting expressions.
 
 prog: LET IN INT RPAREN
 ##
@@ -1406,7 +1527,9 @@ prog: LET IN INT RPAREN
 ## In state 128, spurious reduction of production exprs -> expr
 ##
 
-[E088]Unexpected token
+[E088]Unexpected token after '$0'. Expecting END or more expressions delimited by SEMICOLON
+  expr          -- single expression
+  (expr[;expr]) -- a sequence of expression with the last as its value.
 
 prog: LPAREN INT SEMICOLON VAR
 ##
@@ -1418,7 +1541,8 @@ prog: LPAREN INT SEMICOLON VAR
 ## exprs SEMICOLON
 ##
 
-[E089]Expecting expression
+[E089]Unexpected token after '$0'.
+Note: delete after '$0' or replace with expressions delimited by SEMICOLON
 
 prog: LPAREN INT SEMICOLON INT VAR
 ##
@@ -1442,7 +1566,8 @@ prog: LPAREN INT SEMICOLON INT VAR
 ## exprs SEMICOLON expr
 ##
 
-[E090]Unexpected token
+[E090]Unexpected token after '$0'
+Note: delete after '$0' or replace with expressions delimited by SEMICOLON
 
 prog: LPAREN INT VAR
 ##
@@ -1466,12 +1591,14 @@ prog: LPAREN INT VAR
 ## expr
 ##
 
-[E091]Unexpected token
+[E091]Unexpected token after '$0'
+Note: delete after '$0'
 
 prog: LET FUNCTION WHILE
 ##
 ## Ends in an error in state: 129.
 ##
+## fundec -> FUNCTION . ID nonempty_list(ID) EQ expr [ VAR TYPE IN FUNCTION ]
 ## fundec -> FUNCTION . ID LPAREN tyfields RPAREN EQ expr [ VAR TYPE IN FUNCTION ]
 ## fundec -> FUNCTION . ID LPAREN tyfields RPAREN COLON ID EQ expr [ VAR TYPE IN FUNCTION ]
 ##
@@ -1479,12 +1606,20 @@ prog: LET FUNCTION WHILE
 ## FUNCTION
 ##
 
-[E092]Unexpected token, expecting function definition
+[E092]Unexpected token after '$0'. Expecting ID (function-id). 
+Malformed function definition.
+Note: function definition is one of the three
+  `function id [id] = expr`                      -- juxtapositional with 
+                                                    bidirectional inferred type
+  `function id (id : T[,id' : T']) = expr`       -- inferred return type
+  `function id (id : T[,id' : T']) : T'' = expr` -- explicit type annotation
+
 
 prog: LET FUNCTION ID WHILE
 ##
 ## Ends in an error in state: 130.
 ##
+## fundec -> FUNCTION ID . nonempty_list(ID) EQ expr [ VAR TYPE IN FUNCTION ]
 ## fundec -> FUNCTION ID . LPAREN tyfields RPAREN EQ expr [ VAR TYPE IN FUNCTION ]
 ## fundec -> FUNCTION ID . LPAREN tyfields RPAREN COLON ID EQ expr [ VAR TYPE IN FUNCTION ]
 ##
@@ -1492,7 +1627,13 @@ prog: LET FUNCTION ID WHILE
 ## FUNCTION ID
 ##
 
-[E093]Unexpected token, expecting argument definition
+[E093]Unexpected token after '$0'. Expecting a list of arguments.
+Note: arguments are declared in one of the three
+  `function id [id] = expr`                      -- juxtapositional with 
+                                                    bidirectional inferred type
+  `function id (id : T[,id' : T']) = expr`       -- inferred return type
+  `function id (id : T[,id' : T']) : T'' = expr` -- explicit type annotation
+  
 
 prog: LET FUNCTION ID LPAREN WHILE
 ##
@@ -1505,7 +1646,8 @@ prog: LET FUNCTION ID LPAREN WHILE
 ## FUNCTION ID LPAREN
 ##
 
-[E094]Unexpected token, expecting argument definition or RPAREN
+[E094]Unexpected token after '$0'. Expecting [ID COLON ID] (arg-decl) or RPAREN
+
 
 prog: LET FUNCTION ID LPAREN ID COLON ID WHILE
 ##
@@ -1519,7 +1661,7 @@ prog: LET FUNCTION ID LPAREN ID COLON ID WHILE
 ## FUNCTION ID LPAREN tyfields
 ##
 
-[E095]kUnclosed RPAREN
+[E095]Unexpected token after '$0'. Expecting more arg decl delimited by COMMA or RPAREN
 
 prog: LET FUNCTION ID LPAREN RPAREN WHILE
 ##
@@ -1532,7 +1674,11 @@ prog: LET FUNCTION ID LPAREN RPAREN WHILE
 ## FUNCTION ID LPAREN tyfields RPAREN
 ##
 
-[E096]Unexpected token
+[E096]Unexpected token after '$0'. Expecting EQ or [COLON ID] (extype-anno)
+  `function id (id : T[,id' : T']) = expr`       -- inferred return type
+  `function id (id : T[,id' : T']) : T'' = expr` -- explicit type annotation
+                                   ~~~~^ (extype-anno)
+
 
 prog: LET FUNCTION ID LPAREN RPAREN EQ VAR
 ##
@@ -1544,7 +1690,9 @@ prog: LET FUNCTION ID LPAREN RPAREN EQ VAR
 ## FUNCTION ID LPAREN tyfields RPAREN EQ
 ##
 
-[E097]Unexpected token, expecting function body
+[E097]Unexpected token after '$0'. Expecting expression (function-body)
+  `function ... = expr`
+                  ~~~^ (function-body)
 
 prog: LET FUNCTION ID LPAREN RPAREN EQ INT TO
 ##
@@ -1568,7 +1716,7 @@ prog: LET FUNCTION ID LPAREN RPAREN EQ INT TO
 ## FUNCTION ID LPAREN tyfields RPAREN EQ expr
 ##
 
-[E098]Unexpected token, expecting expression
+[E098]Unexpected token after '$0'. Expecting [VAR | TYPE | IN | FUNCTION]
 
 prog: LET FUNCTION ID LPAREN RPAREN COLON WHILE
 ##
@@ -1580,7 +1728,10 @@ prog: LET FUNCTION ID LPAREN RPAREN COLON WHILE
 ## FUNCTION ID LPAREN tyfields RPAREN COLON
 ##
 
-[E099]Unexpected token, expecting TYPE-ID
+[E099]Unexpected token after '$0'. Expecting ID (type-id).
+Note: explicit return type annotation for function is
+  `function id (id : T[,id' : T']) : T'' = expr`
+                                   ~~~~^ (type-id)
 
 prog: LET FUNCTION ID LPAREN RPAREN COLON ID WHILE
 ##
@@ -1592,7 +1743,7 @@ prog: LET FUNCTION ID LPAREN RPAREN COLON ID WHILE
 ## FUNCTION ID LPAREN tyfields RPAREN COLON ID
 ##
 
-[E100]Expecting function body
+[E100]Unexpected token after '$0'. Expecting EQ.
 
 prog: LET FUNCTION ID LPAREN RPAREN COLON ID EQ VAR
 ##
@@ -1604,7 +1755,9 @@ prog: LET FUNCTION ID LPAREN RPAREN COLON ID EQ VAR
 ## FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ
 ##
 
-[E101]Expecting function body
+[E101]Unexpected token after '$0'. Expecting expression (function-body)
+  `function ... = expr`
+                  ~~~^ (function-body)
 
 prog: LET FUNCTION ID LPAREN RPAREN COLON ID EQ INT TO
 ##
@@ -1628,11 +1781,12 @@ prog: LET FUNCTION ID LPAREN RPAREN COLON ID EQ INT TO
 ## FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ expr
 ##
 
-[E102]Expecting expression
+[E102]Unexpected token after '$0'. Have parsed a function definition.
+Expecting [VAR | TYPE | IN | FUNCTION]
 
 prog: LPAREN INT END
 ##
-## Ends in an error in state: 143.
+## Ends in an error in state: 148.
 ##
 ## expr -> LPAREN exprs . RPAREN [ VAR TYPE TO TIMES THEN SEMICOLON RPAREN RBRACK RBRACE PLUS OR NEQ MINUS LT LE IN GT GE FUNCTION EQ EOF END ELSE DO DIVIDE COMMA AND ]
 ## exprs -> exprs . SEMICOLON expr [ SEMICOLON RPAREN ]
@@ -1647,11 +1801,16 @@ prog: LPAREN INT END
 ## In state 128, spurious reduction of production exprs -> expr
 ##
 
-[E103]Expecting RPAREN
+[E103]Expecting RPAREN or more expressions delimited by SEMICOLON.
+Note: valid expressions include
+  ()            -- Unit
+  expr          -- single expression
+  (expr)        -- single expression
+  (expr[;expr]) -- sequence of expressions
 
 prog: WHILE INT VAR
 ##
-## Ends in an error in state: 146.
+## Ends in an error in state: 151.
 ##
 ## arith -> expr . PLUS expr [ TIMES PLUS OR NEQ MINUS LT LE GT GE EQ DO DIVIDE AND ]
 ## arith -> expr . MINUS expr [ TIMES PLUS OR NEQ MINUS LT LE GT GE EQ DO DIVIDE AND ]
@@ -1671,11 +1830,13 @@ prog: WHILE INT VAR
 ## WHILE expr
 ##
 
-[E104]Expecting DO
+[E104]Unexpected token after '$0'. Expecting DO. Malformed while-loop
+Note: A while-loop has the form of
+  `WHILE expr DO expr`
 
 prog: WHILE INT DO VAR
 ##
-## Ends in an error in state: 147.
+## Ends in an error in state: 152.
 ##
 ## expr -> WHILE expr DO . expr [ VAR TYPE TO TIMES THEN SEMICOLON RPAREN RBRACK RBRACE PLUS OR NEQ MINUS LT LE IN GT GE FUNCTION EQ EOF END ELSE DO DIVIDE COMMA AND ]
 ##
@@ -1683,11 +1844,13 @@ prog: WHILE INT DO VAR
 ## WHILE expr DO
 ##
 
-[E105]Expecting loop body
+[E105]Unexpected token after '$0'. Expecting expression (loop-body)
+  `WHILE expr DO expr`
+                 ~~~^ (loop-body)
 
 prog: WHILE INT DO INT WHILE
 ##
-## Ends in an error in state: 148.
+## Ends in an error in state: 153.
 ##
 ## arith -> expr . PLUS expr [ VAR TYPE TO TIMES THEN SEMICOLON RPAREN RBRACK RBRACE PLUS OR NEQ MINUS LT LE IN GT GE FUNCTION EQ EOF END ELSE DO DIVIDE COMMA AND ]
 ## arith -> expr . MINUS expr [ VAR TYPE TO TIMES THEN SEMICOLON RPAREN RBRACK RBRACE PLUS OR NEQ MINUS LT LE IN GT GE FUNCTION EQ EOF END ELSE DO DIVIDE COMMA AND ]
@@ -1707,11 +1870,12 @@ prog: WHILE INT DO INT WHILE
 ## WHILE expr DO expr
 ##
 
-[E106]Expecting expression
+[E106]Unexpected token after '$0'. Have parsed while-loop.
+Note: delete after '$0'
 
 prog: INT VAR
 ##
-## Ends in an error in state: 150.
+## Ends in an error in state: 155.
 ##
 ## arith -> expr . PLUS expr [ TIMES PLUS OR NEQ MINUS LT LE GT GE EQ EOF DIVIDE AND ]
 ## arith -> expr . MINUS expr [ TIMES PLUS OR NEQ MINUS LT LE GT GE EQ EOF DIVIDE AND ]
@@ -1731,7 +1895,8 @@ prog: INT VAR
 ## expr
 ##
 
-[E107]Unexpected token
+[E107]Unexpected token after '$0'. Have parsed expr
+Note: delete after '$0'
 
 prog: ID INT WHILE
 ##
@@ -1744,4 +1909,70 @@ prog: ID INT WHILE
 ## funcall
 ##
 
-[E108]Unexpected token after ($0)
+[E108]Unexpected token after '$0'. Have parsed funcall.
+Note: funcall is one of the two
+  lvalue argvalue  -- juxtapositional
+  lvalue(argvalue) -- parenthesized
+where argvalue is [INT | STRING | lvalue | NIL | (exprc)]
+
+prog: LET FUNCTION ID ID WHILE
+##
+## Ends in an error in state: 140.
+##
+## nonempty_list(ID) -> ID . [ EQ ]
+## nonempty_list(ID) -> ID . nonempty_list(ID) [ EQ ]
+##
+## The known suffix of the stack is as follows:
+## ID
+##
+
+[E109]Unexpected token after '$0'. Expecting more arguments or EQ.
+  `function id [id] = expr`
+
+prog: LET FUNCTION ID ID EQ VAR
+##
+## Ends in an error in state: 143.
+##
+## fundec -> FUNCTION ID nonempty_list(ID) EQ . expr [ VAR TYPE IN FUNCTION ]
+##
+## The known suffix of the stack is as follows:
+## FUNCTION ID nonempty_list(ID) EQ
+##
+
+[E110]function definition ended abruptly.
+Note: A valid letexp with a fundec looks like
+  `function id x = x`
+
+prog: LET FUNCTION ID ID EQ ID TO
+##
+## Ends in an error in state: 144.
+##
+## arith -> expr . PLUS expr [ VAR TYPE TIMES PLUS OR NEQ MINUS LT LE IN GT GE FUNCTION EQ DIVIDE AND ]
+## arith -> expr . MINUS expr [ VAR TYPE TIMES PLUS OR NEQ MINUS LT LE IN GT GE FUNCTION EQ DIVIDE AND ]
+## arith -> expr . TIMES expr [ VAR TYPE TIMES PLUS OR NEQ MINUS LT LE IN GT GE FUNCTION EQ DIVIDE AND ]
+## arith -> expr . DIVIDE expr [ VAR TYPE TIMES PLUS OR NEQ MINUS LT LE IN GT GE FUNCTION EQ DIVIDE AND ]
+## compare -> expr . EQ expr [ VAR TYPE TIMES PLUS OR NEQ MINUS LT LE IN GT GE FUNCTION EQ DIVIDE AND ]
+## compare -> expr . NEQ expr [ VAR TYPE TIMES PLUS OR NEQ MINUS LT LE IN GT GE FUNCTION EQ DIVIDE AND ]
+## compare -> expr . GT expr [ VAR TYPE TIMES PLUS OR NEQ MINUS LT LE IN GT GE FUNCTION EQ DIVIDE AND ]
+## compare -> expr . LT expr [ VAR TYPE TIMES PLUS OR NEQ MINUS LT LE IN GT GE FUNCTION EQ DIVIDE AND ]
+## compare -> expr . GE expr [ VAR TYPE TIMES PLUS OR NEQ MINUS LT LE IN GT GE FUNCTION EQ DIVIDE AND ]
+## compare -> expr . LE expr [ VAR TYPE TIMES PLUS OR NEQ MINUS LT LE IN GT GE FUNCTION EQ DIVIDE AND ]
+## compare -> expr . AND expr [ VAR TYPE TIMES PLUS OR NEQ MINUS LT LE IN GT GE FUNCTION EQ DIVIDE AND ]
+## compare -> expr . OR expr [ VAR TYPE TIMES PLUS OR NEQ MINUS LT LE IN GT GE FUNCTION EQ DIVIDE AND ]
+## fundec -> FUNCTION ID nonempty_list(ID) EQ expr . [ VAR TYPE IN FUNCTION ]
+##
+## The known suffix of the stack is as follows:
+## FUNCTION ID nonempty_list(ID) EQ expr
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 16, spurious reduction of production lvalue_ ->
+## In state 70, spurious reduction of production lvalue -> ID lvalue_
+## In state 24, spurious reduction of production expr -> lvalue
+##
+
+[E110]Let-expression ended abruptly. Expecting more declarations or IN followed by expression.
+Note: A valid letexp looks like
+  `let function id x = x in id 1 end`

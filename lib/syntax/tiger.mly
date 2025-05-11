@@ -94,6 +94,7 @@ vardec:
 
 // functions
 fundec:
+| "function" ID ID+ "=" expr {}
 | "function" ID "(" tyfields ")" "=" expr   {}
 | "function" ID "(" tyfields ")" ":" tid "=" expr   {}
 
